@@ -1,2 +1,0 @@
-# ReactTestPr
-Created with CodeSandbox
