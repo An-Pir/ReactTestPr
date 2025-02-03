@@ -1,0 +1,13 @@
+#root{
+    background-color: rgb(194, 194, 194);
+    margin: 40px auto;
+    padding: 10px;
+    text-align: center;
+}
+
+.test{
+    width: 100px;
+    height: 100px;
+    background-color: orange;
+    margin: auto;
+}
