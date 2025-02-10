@@ -3,50 +3,40 @@ import { useState } from 'react';
 
 const CostForm = () => {
 
-    // const [userInput , setUserInput] = useState({
-    //     name: '',
-    //     amount: '',
-    //     date: '',
-    // })
-    const [name, setName] = useState('');
-    const [amount, setAmount] = useState('');
-    const [date, setDame] = useState('');
+    const [inputName, setInputName] = useState('');
+    const [inputAmount, setInputAmount] = useState('');
+    const [inputDate, setInputDame] = useState('');
 
     const nameChangeHandler = (event) => {
-        setName(event.target.value)
-
-        // setUserInput({ 
-        //     ...userInput,
-        //     name: event.target.value })
-
-        // setUserInput((previousState) => {
-        //     return {
-        //         ...previousState,
-        //         name:event.target.value
-        //     }
-        // })
+        setInputName(event.target.value)
     }
 
     const amountChangeHandler = (event) => {
-        setAmount(event.target.value)
-
-        // setUserInput({
-        //     ...userInput,
-        //     amount: event.target.value
-        // })
+        setInputAmount(event.target.value)
     }
 
     const dateChangeHandler = (event) => {
-        setDame(event.target.value)
-        
-        // setUserInput({
-        //     ...userInput,
-        //     date: event.target.value
-        // })
+        setInputDame(event.target.value)
     }
 
+    const submitHandler = (event) => {
+      event.preventDefault();
+
+      if(!inputName || !inputAmount || !inputDate){
+        alert("Заполните все поля формы");
+        return;
+      }
+
+      const costData = {
+        name: inputName,
+        amount: inputAmount,
+        date: new Date (inputDate),
+      }
+
+      console.log(costData);
+    }
   return (
-    <form>
+    <form onSubmit={submitHandler}>
       <div className="new-cost__controls">
         <div className="new-cost__control">
           <label>Название</label>
