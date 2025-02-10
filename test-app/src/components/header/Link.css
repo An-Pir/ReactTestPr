@@ -1,0 +1,15 @@
+.navLinkComponent{
+    color: #495769;
+    font-size: 18px;
+    transition: all .4s;
+}
+.navLinkComponent:hover{
+    color: #ffffff;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 2px;
+    transform: scale(1.03);
+}
+.active{
+    color: #fff;
+}

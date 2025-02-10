@@ -1,0 +1,9 @@
+.pageWrap{
+    width: 100vw;
+    height: 100vh;
+    background-color: #8ca0cc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+}

@@ -1,0 +1,11 @@
+.input-wrap{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-inline: 20px;
+}
+.input-wrap+.checkbox{
+    flex-direction: row-reverse;
+    gap: 20px;
+    font-size: 12px;
+}

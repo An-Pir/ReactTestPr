@@ -1,0 +1,14 @@
+.header{
+    background-color: #8ca0cc;
+    width: 100vw;
+    
+    display: flex;
+}
+.header-wrap{
+    display: flex;
+    justify-content: space-between;
+    gap: 50px;
+}
+
+
+
