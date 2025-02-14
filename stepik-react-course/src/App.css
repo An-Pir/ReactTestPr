@@ -1,0 +1,19 @@
+.App{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.btn-wrap{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.btn-wrap button{
+    padding: 10px;
+    background-color: #a86868;
+}
+.btn-wrap+button{
+    padding: 10px 30px;
+    background-color: #d8af27;
+}
