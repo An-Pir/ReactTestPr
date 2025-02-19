@@ -5,6 +5,7 @@ import MainPage from "./components/main/mainPage/MainPage";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./components/main/auth/LoginPage";
 import RegistrationPage from "./components/main/auth/RegistrationPage";
+import Footer from "./components/footer/Footer";
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/reg" element={<RegistrationPage />} />
         <Route path="/login" element={<LoginPage />} />
       </Routes>
+      <Footer/>
     </Router>
   );
 }

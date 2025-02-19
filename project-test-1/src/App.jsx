@@ -1,35 +1,17 @@
-import React, { Component } from "react";
+import React from 'react';
 import './App.css';
+import Footer from './Footer';
+import Content from './Content';
+import Header from './Header';
 
-class App extends Component {
-  state = {
-    count: 1,
-  };
-
-  increment = () => {
-     this.setState({ count: this.state.count + 1 });
-  };
-
-  decrement = () => {
-    this.setState({count: this.state.count - 1});
-  }
-
-  reset = () => {
-    this.setState({count: 0})
-  }
-  render() {
-
-    const isButtonDisable = this.state.count <= 0;
-
-    return (
-      <div className="App">
-        <button onClick={this.increment}>+</button>
-        <span>{this.state.count}</span>
-        <button onClick={this.decrement} disabled={isButtonDisable}>-</button>
-        <button onClick={this.reset} disabled={isButtonDisable}>RESET</button>
-      </div>
-    );
-  }
-}
+const App = () => {
+  return (
+    <div className='App'>
+      <Header/>
+      <Content/>
+      <Footer/>
+    </div>
+  );
+};
 
 export default App;

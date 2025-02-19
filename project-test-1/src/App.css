@@ -1,12 +1,22 @@
 .App{
-    height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    font-size: 24px;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
 }
-button{
-    border: red 1px solid;
-
+.main{
+    flex: 1;
+    background-color: #e5e7d9;
+    
+}
+h1{
+    text-align: center;
+}
+.item{
+    list-style-type: none;
+}
+footer{
+    padding: 15px;
+    background-color: #24a034;
+    text-align: center;
 }
