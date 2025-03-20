@@ -1,0 +1,28 @@
+.App {
+  text-align: center;
+}
+h1{
+  color:greenyellow
+}
+span {
+  color:red ;
+  margin-inline: 0.5rem;
+}
+.btn{
+  padding: 0.5rem 1rem;
+  border: none
+
+}
+.btn:last-child{
+ margin-left: 0.5rem;
+}
+
+.btn.start{
+  background-color: green;
+  color: #fff
+}
+.btn.stop{
+  background-color: red;
+  color: #fff;
+}
+

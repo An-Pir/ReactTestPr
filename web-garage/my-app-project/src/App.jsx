@@ -1,35 +1,81 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import TodoItem from './components/TodoItem';
+import AddTodo from './components/AddTodo';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const initialTodos = [];
+
+  // функция изменения темы
+  const getInitialTheme = () => {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia(
+      '(prefers-color-scheme: dark)'
+    ).matches;
+
+    if (savedTheme) {
+      return savedTheme;
+    } else if (prefersDark) {
+      return 'dark';
+    } else {
+      const hours = new Date().getHours();
+      return hours < 6 || hours >= 21 ? 'dark' : 'light';
+    }
+  };
+
+  const [todos, setTodos] = useState(initialTodos); 
+  const [theme, setTheme] = useState(getInitialTheme()); // состояние темы
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => {
+      const newTheme = prevTheme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('theme', newTheme);
+      return newTheme;
+    });
+  };
+
+  const onDelete = (id) => {
+    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+  };
+
+  const onAdd = (text) => {
+    const newTodo = {
+      id: Date.now(),
+      text: text,
+    };
+    setTodos([...todos, newTodo]);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div
+      data-theme={theme}
+      className='flex flex-col min-h-screen justify-center items-center bg-page-light dark:bg-page-dark p-6 '
+    >
+      <div className='mb-6'>
+        <div className='flex items-center cursor-pointer'>
+          <button className='relative' onClick={toggleTheme}>
+            <div className='w-14 h-7 rounded-full shadow-inner transition-colors duration-300 bg-gray-300 dark:bg-btn-dark'></div>
+            <div className='absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 translate-x-0 dark:translate-x-7'></div>
+          </button>
+          <span className='ml-3 text-gray-700 dark:text-gray-300 font-medium'>
+            {theme === 'light' ? 'Светлая' : 'Темная'}
+          </span>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div className='mx-auto flex flex-col gap-3'>
+        <h1 className=' text-4xl font-bold text-center text-gray-800 dark:text-white mb-8'>
+          <span className=' bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500'>
+            Список задач
+          </span>
+        </h1>
+        <AddTodo onAdd={onAdd} />
+        <div className=' flex flex-col gap-3'>
+          {todos.map((todo) => (
+            <TodoItem key={todo.id} todo={todo} onDelete={onDelete} />
+          ))}
+        </div>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
