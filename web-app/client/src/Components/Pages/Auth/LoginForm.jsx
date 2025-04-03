@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../../Common/Button';
 import Input from '../../Common/Input';
 import AuthFormTitle from '../../Common/AuthFormTitle';
+import axios from 'axios'; // Импортируем axios для работы с HTTP-запросами
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -30,7 +31,21 @@ const LoginForm = () => {
     setError('');
     setLoading(true);
 
-  } 
+    try {
+      const response = await axios.post('http://localhost:5000/api/auth/login', { login, password });
+      const { role } = response.data; // Предполагаем, что API возвращает объект с полем role
+
+      if (role === 'admin') {
+        navigate('/admin'); // Перенаправляем на страницу администратора
+      } else {
+        setError('У вас нет доступа к этой странице'); // Сообщение об ошибке для неадминистраторов
+      }
+    } catch (err) {
+      setError('Ошибка авторизации. Проверьте логин и пароль.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleClosingPage = () => {
     navigate('/');
@@ -48,7 +63,7 @@ const LoginForm = () => {
       <form
         onClick={handleFormClick}
         onSubmit={handleSubmit}
-        className='flex flex-col gap-4 shadow-lg p-10 bg-white rounded-md absolute'
+        className='flex flex-col gap-6 shadow-lg p-15 bg-white rounded-md absolute'
       >
         <AuthFormTitle title='Авторизация' />
 
@@ -71,8 +86,8 @@ const LoginForm = () => {
         />
 
         <div className='flex justify-between gap-3.5'>
-          <Button name={loading ? 'Загрузка...' : 'Войти'} disabled={loading} />
-          <Button onClick={handleReset} name='Сбросить' type='button' />
+          <Button name={loading ? 'Загрузка...' : 'Войти'} disabled={loading} className=' bg-dark-blue text-white hover:text-orange px-5 ' />
+          <Button onClick={handleReset} name='Сбросить' className=' bg-dark-blue text-white hover:text-orange px-5 ' type='button' />
         </div>
       </form>
     </div>

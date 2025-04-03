@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import Input from '../../Common/Input';
 import Button from '../../Common/Button';
+import { useNavigate } from 'react-router-dom';
 
 
 const AdminInterface = () => {
-  // Список калькуляторов
-  const [calculators, setCalculators] = useState([]);
+  const [calculators, setCalculators] = useState([]);// Список калькуляторов
+  const navigate = useNavigate(); // Инициализация navigate
+
 
   // Состояния для добавления нового калькулятора
   const [newProductName, setNewProductName] = useState('');
@@ -58,8 +60,16 @@ const AdminInterface = () => {
     setCalculators(calculators.filter((calc) => calc.id !== id));
   };
 
+   // Функция выхода из административного интерфейса
+   const handleLogout = () => {
+    // Здесь можно добавить логику для очистки токена или состояния пользователя
+    // Например, если вы используете контекст или Redux, сбросьте состояние пользователя
+    // localStorage.removeItem('token'); // Если вы храните токен в localStorage
+    navigate('/'); // Перенаправляем на страницу входа
+  };
+
   return (
-    <div className=" flex-1 flex flex-col items-center p-4">
+    <div className=" container m-auto flex-1 flex flex-col items-center p-4">
       <h2 className="text-3xl text-center font-bold py-8 text-dark-blue">Административный интерфейс управления калькуляторами</h2>
 
       {/* Форма добавления нового калькулятора */}
@@ -83,7 +93,7 @@ const AdminInterface = () => {
       </div>
 
       {/* Список калькуляторов */}
-      <div className=" bg-gray-200 w-full py-7 ">
+      <div className=" bg-gray-200 w-full py-7  mb-10">
         <h3 className="text-2xl  text-center font-medium mb-2  text-dark-blue underline text">Список калькуляторов</h3>
         {calculators.length === 0 ? (
           <p className='text-center text-lg text-orange font-medium'>Нет добавленных калькуляторов</p>
@@ -134,6 +144,7 @@ const AdminInterface = () => {
           </ul>
         )}
       </div>
+      <Button onClick={handleLogout} className="bg-red-400 text-white  hover:bg-white hover:text-red-400 hover:border hover:border-red-500 " name="Выйти из админпанели" />
     </div>
   );
 };

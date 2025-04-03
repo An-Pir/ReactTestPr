@@ -39,4 +39,29 @@ router.post('/register', async (req, res) => {
   }
 });
 
+// Роут для аутентификации пользователя 
+router.post('/login', async (req, res) => {
+  const { login, password } = req.body;
+
+  try {
+    // Поиск пользователя по логину
+    const user = await User.findOne({ login });
+    if (!user) {
+      return res.status(401).json({ message: 'Неверные учетные данные' });
+    }
+
+    // Сравнение введенного пароля с хэшированным паролем
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Неверные учетные данные' });
+    }
+
+    // Если аутентификация успешна, возвращаем роль пользователя
+    res.json({ role: user.role || 'user' }); // Вернем роль пользователя
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Ошибка сервера при аутентификации пользователя' });
+  }
+});
+
 module.exports = router;

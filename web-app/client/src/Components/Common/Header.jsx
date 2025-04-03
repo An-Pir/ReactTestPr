@@ -15,25 +15,30 @@ const Header = () => {
   };
 
   return (
-    <header className=' h-14.5'>
-      <div className=' container mx-auto flex flex-wrap justify-between gap-5 items-center '>
+    <header className=' container m-auto'>
+      <div className=' container mx-auto flex flex-wrap justify-between gap-5 items-center border-b-2 border-dark-blue '>
         <Link to='/'>
-          <img src={logo} alt='Логотип банка' className='h-18' />
+          <img src={logo} alt='Логотип банка' className='h-20 my-5 mx-2' />
         </Link>
 
-        <div className=' flex gap-5 flex-wrap'>
-          {location.pathname !== '/login' && location.pathname !== '/registration' && (
-            <>
-              <Button name='Войти' onClick={handleButtonLoginClick} />
-              <Button
-                name='Зарегистрироваться'
-                onClick={handleButtonRegisterClick}
-              />
-            </>
-          )}
+        <div className=' flex gap-5 flex-wrap mx-2'>
+          {location.pathname !== '/login' &&
+            location.pathname !== '/registration' && (
+              <>
+                <Button
+                  name='Войти'
+                  onClick={handleButtonLoginClick}
+                  className=' bg-dark-blue text-white hover:text-orange px-6 '
+                />
+                <Button
+                  name='Зарегистрироваться'
+                  onClick={handleButtonRegisterClick}
+                  className=' bg-dark-blue text-white hover:text-orange px-6 '
+                />
+              </>
+            )}
         </div>
       </div>
-      <hr className=' h-0.5 bg-light-blue ' />
     </header>
   );
 };
