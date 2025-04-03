@@ -15,13 +15,13 @@ const Header = () => {
   };
 
   return (
-    <header className=' container m-auto'>
-      <div className=' container mx-auto flex flex-wrap justify-between gap-5 items-center border-b-2 border-dark-blue '>
+    <header className=' container m-auto mt-5 '>
+      <div className=' container mx-auto flex flex-wrap justify-center md:justify-between  gap-2 items-center border-b-2 px-5 pb-5 border-dark-blue '>
         <Link to='/'>
-          <img src={logo} alt='Логотип банка' className='h-20 my-5 mx-2' />
+          <img src={logo} alt='Логотип банка' className='h-20 mt-2 mx-2' />
         </Link>
 
-        <div className=' flex gap-5 flex-wrap mx-2'>
+        <div className=' flex justify-center  md:justify-between gap-2 flex-wrap  '>
           {location.pathname !== '/login' &&
             location.pathname !== '/registration' && (
               <>

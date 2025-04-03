@@ -21,7 +21,9 @@ const AdminInterface = () => {
   useEffect(() => {
     const fetchCalculators = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/calculators');
+        const response = await axios.get(
+          'http://localhost:5000/api/calculators'
+        );
         setCalculators(response.data);
       } catch (error) {
         console.error('Ошибка при получении калькуляторов:', error);
@@ -41,7 +43,10 @@ const AdminInterface = () => {
     };
 
     try {
-      const response = await axios.post('http://localhost:5000/api/calculators', newCalc);
+      const response = await axios.post(
+        'http://localhost:5000/api/calculators',
+        newCalc
+      );
       // Обновляем список калькуляторов, добавив вновь созданный объект из базы данных
       setCalculators([...calculators, response.data]);
       setNewProductName('');
@@ -66,7 +71,10 @@ const AdminInterface = () => {
     };
 
     try {
-      const response = await axios.put(`http://localhost:5000/api/calculators/${editingId}`, updatedCalc);
+      const response = await axios.put(
+        `http://localhost:5000/api/calculators/${editingId}`,
+        updatedCalc
+      );
       setCalculators(
         calculators.map((calc) =>
           (calc._id || calc.id) === editingId ? response.data : calc
@@ -84,7 +92,9 @@ const AdminInterface = () => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/api/calculators/${id}`);
-      setCalculators(calculators.filter((calc) => (calc._id || calc.id) !== id));
+      setCalculators(
+        calculators.filter((calc) => (calc._id || calc.id) !== id)
+      );
     } catch (error) {
       console.error('Ошибка при удалении калькулятора:', error);
     }
@@ -107,29 +117,35 @@ const AdminInterface = () => {
       </h2>
 
       {/* Форма добавления нового калькулятора */}
-      <div className='text-center text-dark-blue bg-gray-100 w-full py-12'>
-        <h3 className='text-2xl font-medium mb-5 underline'>
+      <div className=' flex flex-col gap-5 justify-center text-dark-blue bg-gray-100 w-full py-12'>
+        <h3 className=' text-center text-2xl font-medium  underline'>
           Добавить калькулятор
         </h3>
-        <Input
-          type='text'
-          placeholder='Название банковского продукта'
-          value={newProductName}
-          onChange={(e) => setNewProductName(e.target.value)}
-          className='border p-2 mr-2 rounded'
-        />
-        <Input
-          type='number'
-          placeholder='Процентная ставка'
-          value={newInterestRate}
-          onChange={(e) => setNewInterestRate(e.target.value)}
-          className='border p-2 mr-2 rounded'
-        />
-        <Button
-          onClick={handleAdd}
-          className='bg-dark-blue text-white hover:text-orange'
-          name='Добавить'
-        />
+        <div className=' flex flex-wrap justify-center gap-5'>
+          <div className='  flex gap-5 flex-wrap justify-center'>
+            <Input
+              type='text'
+              placeholder='Название банковского продукта'
+              value={newProductName}
+              onChange={(e) => setNewProductName(e.target.value)}
+              className='border p-2  rounded '
+            />
+            <Input
+              type='number'
+              placeholder='Процентная ставка'
+              value={newInterestRate}
+              onChange={(e) => setNewInterestRate(e.target.value)}
+              className='border p-2  rounded '
+            />
+          </div>
+          <div>
+            <Button
+              onClick={handleAdd}
+              className='bg-dark-blue text-white hover:text-orange'
+              name='Добавить'
+            />
+          </div>
+        </div>
       </div>
 
       {/* Список калькуляторов */}
@@ -150,37 +166,41 @@ const AdminInterface = () => {
               >
                 {editingId === (calc._id || calc.id) ? (
                   // Режим редактирования
-                  <div className='flex items-center gap-2'>
-                    <Input
-                      type='text'
-                      value={editedProductName}
-                      onChange={(e) => setEditedProductName(e.target.value)}
-                      className='border p-1 rounded'
-                    />
-                    <Input
-                      type='number'
-                      value={editedInterestRate}
-                      onChange={(e) => setEditedInterestRate(e.target.value)}
-                      className='border p-1 rounded'
-                    />
-                    <Button
-                      onClick={handleUpdate}
-                      name='Сохранить'
-                      className='bg-dark-blue text-white hover:text-orange hover:border hover:border-inherit'
-                    />
-                    <Button
-                      onClick={() => setEditingId(null)}
-                      name='Отмена'
-                      className='bg-gray-500 text-white hover:bg-white hover:text-orange hover:border hover:border-inherit'
-                    />
+                  <div className='flex   flex-wrap justify-center gap-5'>
+                    <div className=' flex gap-5 justify-center flex-wrap'>
+                      <Input
+                        type='text'
+                        value={editedProductName}
+                        onChange={(e) => setEditedProductName(e.target.value)}
+                        className='border p-1 rounded '
+                      />
+                      <Input
+                        type='number'
+                        value={editedInterestRate}
+                        onChange={(e) => setEditedInterestRate(e.target.value)}
+                        className='border p-1 rounded '
+                      />
+                    </div>
+                    <div className=' flex gap-5 justify-center flex-wrap'>
+                      <Button
+                        onClick={handleUpdate}
+                        name='Сохранить'
+                        className='bg-dark-blue text-white hover:text-orange '
+                      />
+                      <Button
+                        onClick={() => setEditingId(null)}
+                        name='Отмена'
+                        className='bg-gray-500 text-white hover:bg-white hover:text-orange '
+                      />
+                    </div>
                   </div>
                 ) : (
                   // Отображение данных калькулятора
-                  <div className='w-full flex items-center justify-between'>
+                  <div className='w-full flex flex-col md:flex-row items-center justify-between gap-5'>
                     <span>
                       <strong>{calc.productName}</strong> — {calc.interestRate}%
                     </span>
-                    <div className='flex gap-2'>
+                    <div className='flex gap-6'>
                       <Button
                         onClick={() => handleEdit(calc)}
                         name='Редактировать'
@@ -189,7 +209,7 @@ const AdminInterface = () => {
                       <Button
                         onClick={() => handleDelete(calc._id || calc.id)}
                         name='Удалить'
-                        className='bg-white text-red-500 border border-red-500 hover:bg-red-500 hover:text-white'
+                        className='bg-white text-red-500  hover:bg-red-500 hover:text-white'
                       />
                     </div>
                   </div>
@@ -201,7 +221,7 @@ const AdminInterface = () => {
       </div>
       <Button
         onClick={handleLogout}
-        className='bg-red-400 text-white hover:bg-white hover:text-red-400 hover:border hover:border-red-500'
+        className='bg-red-400 text-white hover:bg-white hover:text-red-400  '
         name='Выйти из админпанели'
       />
     </div>
