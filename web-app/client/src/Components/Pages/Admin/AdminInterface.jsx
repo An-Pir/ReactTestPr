@@ -9,12 +9,12 @@ const AdminInterface = () => {
   const navigate = useNavigate();
 
   // Состояния для добавления нового калькулятора
-  const [newProductName, setNewProductName] = useState('');
+  const [newCalculatorName, setNewCalculatorName] = useState('');
   const [newInterestRate, setNewInterestRate] = useState('');
 
   // Состояния для редактирования
   const [editingId, setEditingId] = useState(null);
-  const [editedProductName, setEditedProductName] = useState('');
+  const [editedCalculatorName, setEditedCalculatorName] = useState('');
   const [editedInterestRate, setEditedInterestRate] = useState('');
 
   // Загрузка калькуляторов из базы данных при монтировании компонента
@@ -35,10 +35,10 @@ const AdminInterface = () => {
 
   // Функция добавления нового калькулятора
   const handleAdd = async () => {
-    if (!newProductName || !newInterestRate) return;
+    if (!newCalculatorName || !newInterestRate) return;
 
     const newCalc = {
-      productName: newProductName,
+      calculatorName: newCalculatorName,
       interestRate: parseFloat(newInterestRate),
     };
 
@@ -49,7 +49,7 @@ const AdminInterface = () => {
       );
       // Обновляем список калькуляторов, добавив вновь созданный объект из базы данных
       setCalculators([...calculators, response.data]);
-      setNewProductName('');
+      setNewCalculatorName('');
       setNewInterestRate('');
     } catch (error) {
       console.error('Ошибка при добавлении калькулятора:', error);
@@ -59,14 +59,14 @@ const AdminInterface = () => {
   // Функция для перехода в режим редактирования выбранного калькулятора
   const handleEdit = (calc) => {
     setEditingId(calc._id || calc.id);
-    setEditedProductName(calc.productName);
+    setEditedCalculatorName(calc.calculatorName);
     setEditedInterestRate(calc.interestRate);
   };
 
   // Функция обновления данных калькулятора
   const handleUpdate = async () => {
     const updatedCalc = {
-      productName: editedProductName,
+      calculatorName: editedCalculatorName,
       interestRate: parseFloat(editedInterestRate),
     };
 
@@ -81,7 +81,7 @@ const AdminInterface = () => {
         )
       );
       setEditingId(null);
-      setEditedProductName('');
+      setEditedCalculatorName('');
       setEditedInterestRate('');
     } catch (error) {
       console.error('Ошибка при обновлении калькулятора:', error);
@@ -126,8 +126,8 @@ const AdminInterface = () => {
             <Input
               type='text'
               placeholder='Название банковского продукта'
-              value={newProductName}
-              onChange={(e) => setNewProductName(e.target.value)}
+              value={newCalculatorName}
+              onChange={(e) => setNewCalculatorName(e.target.value)}
               className='border p-2  rounded '
             />
             <Input
@@ -170,8 +170,8 @@ const AdminInterface = () => {
                     <div className=' flex gap-5 justify-center flex-wrap'>
                       <Input
                         type='text'
-                        value={editedProductName}
-                        onChange={(e) => setEditedProductName(e.target.value)}
+                        value={editedCalculatorName}
+                        onChange={(e) => setEditedCalculatorName(e.target.value)}
                         className='border p-1 rounded '
                       />
                       <Input
@@ -198,7 +198,7 @@ const AdminInterface = () => {
                   // Отображение данных калькулятора
                   <div className='w-full flex flex-col md:flex-row items-center justify-between gap-5'>
                     <span>
-                      <strong>{calc.productName}</strong> — {calc.interestRate}%
+                      <strong>{calc.calculatorName}</strong> — {calc.interestRate}%
                     </span>
                     <div className='flex gap-6'>
                       <Button

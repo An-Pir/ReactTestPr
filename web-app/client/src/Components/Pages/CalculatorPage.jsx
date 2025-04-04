@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import PageTitle from '../Common/PageTitle';
 
-const Calculator = () => {
-  const [bankProducts, setBankProducts] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState('');
+const CalculatorPage = () => {
+  const [bankCalculators, setBankCalculators] = useState([]);
+  const [selectedCalculator, setSelectedCalculator] = useState('');
   const [creditAmount, setCreditAmount] = useState('');
   const [creditTerm, setCreditTerm] = useState('');
   const [cost, setCost] = useState('');
@@ -14,36 +15,33 @@ const Calculator = () => {
   useEffect(() => {
     axios
       .get('http://localhost:5000/api/calculators')
-      .then((response) => setBankProducts(response.data))
+      .then((response) => setBankCalculators(response.data))
       .catch((err) => console.error(err));
   }, []);
 
   const handleCalculate = () => {
-    // Находим выбранный продукт, чтобы определить, какие поля передавать
-    const selectedBankProduct = bankProducts.find(
-      (product) => product._id === selectedProduct
+    const selectedBankCalculator = bankCalculators.find(
+      (calculator) => calculator._id === selectedCalculator
     );
 
-    // Формируем данные запроса; creditTerm преобразуем в годы (делим на 12)
+    // Формирование данных запроса: перевод срока кредита из месяцев в годы
     const requestData = {
-      calculatorId: selectedProduct,
+      calculatorId: selectedCalculator,
       creditTerm: Number(creditTerm) / 12,
     };
 
-    if (selectedBankProduct) {
-      const productNameLower = selectedBankProduct.productName.toLowerCase();
+    if (selectedBankCalculator) {
+      const calculatortNameLower = selectedBankCalculator.calculatorName.toLowerCase();
 
-      if (productNameLower === 'ипотечный' || productNameLower === 'автокредит') {
+      if (calculatorNameLower === 'ипотечный' || calculatorNameLower === 'автокредит') {
         requestData.cost = Number(cost);
         requestData.downPayment = Number(downPayment);
-      } else if (productNameLower === 'потребительский кредит') {
+      } else if (calculatorNameLower === 'потребительский') {
         requestData.creditAmount = Number(creditAmount);
       } else {
-        // Для неизвестного типа продукта используем creditAmount как запасной вариант
         requestData.creditAmount = Number(creditAmount);
       }
     } else {
-      // Если не выбран продукт, передаем creditAmount
       requestData.creditAmount = Number(creditAmount);
     }
 
@@ -54,74 +52,108 @@ const Calculator = () => {
   };
 
   // Определяем выбранный продукт для условной отрисовки дополнительных полей
-  const selectedBankProduct = bankProducts.find(
-    (product) => product._id === selectedProduct
+  const selectedBankCalculator = bankCalculators.find(
+    (calculator) => calculator._id === selectedCalculator
   );
-  const productNameLower = selectedBankProduct
-    ? selectedBankProduct.productName.toLowerCase()
+  const calculatorNameLower = selectedBankCalculator
+    ? selectedBankCalculator.calculatorName.toLowerCase()
     : '';
 
+  // Проверка условий для активации кнопки (оставляем для наглядности, если понадобится)
+  const isButtonDisabled = () => {
+    const isCalculatorSelected = selectedCalculator !== '';
+    const isFormFilled =
+      (calculatorNameLower === 'ипотечный' || calculatorNameLower === 'автокредит') 
+        ? cost && downPayment && creditTerm
+        : (calculatorNameLower === 'потребительский кредит' || !selectedBankCalculator) 
+          ? creditAmount && creditTerm
+          : creditTerm; // Для прочих случаев требуется заполнить только срок кредита
+
+    return !isCalculatorSelected || !isFormFilled;
+  };
+
   return (
-    <div>
-      <h2>Финансовый калькулятор</h2>
-      <div>
-        <label>Выберите продукт:</label>
+    <div className=' container m-auto  h-screen'>
+      <PageTitle name='Финансовый калькулятор' className='mt-10'/>
+      <div className='text-center'>
+
+        <label className='text-dark-blue  text-[18px] sm:text-2xl lg:text-3xl font-medium pr-4'>Выберите калькулятор:</label>
         <select
-          value={selectedProduct}
-          onChange={(e) => setSelectedProduct(e.target.value)}
+        className=' text-center text-[18px] sm:text-2xl lg:text-3xl text-orange focus:outline-none'
+          value={selectedCalculator}
+          onChange={(e) => {
+            setSelectedCalculator(e.target.value);
+            // Сбросим поля при изменении выбора продукта:
+            setCreditAmount('');
+            setCreditTerm('');
+            setCost('');
+            setDownPayment('');
+            setResult(null);
+          }}
         >
-          <option value="">-- Выберите --</option>
-          {bankProducts.map((product) => (
-            <option key={product._id} value={product._id}>
-              {product.productName} ({product.interestRate || product.annualRate}%)
+          <option className=' text-dark-blue' value="">-- Все калькуляторы --</option>
+          {bankCalculators.map((calculator) => (
+            <option key={calculator._id} value={calculator._id}>
+              {calculator.calculatorName} ({calculator.interestRate || calculator.annualRate}%)
             </option>
           ))}
         </select>
       </div>
-      {(productNameLower === 'ипотечный' || productNameLower === 'автокредит') && (
+
+      {/* Если продукт не выбран, скрываем поля ввода и кнопку */}
+      {selectedCalculator && (
         <>
+          {(calculatorNameLower === 'ипотечный' || calculatorNameLower === 'автокредит') && (
+            <>
+              <div>
+                <label>Стоимость объекта:</label>
+                <input
+                  type="number"
+                  value={cost}
+                  onChange={(e) => setCost(e.target.value)}
+                />
+              </div>
+              <div>
+                <label>Первоначальный взнос:</label>
+                <input
+                  type="number"
+                  value={downPayment}
+                  onChange={(e) => setDownPayment(e.target.value)}
+                />
+              </div>
+            </>
+          )}
+          {(calculatorNameLower === 'потребительский' || !selectedBankCalculator) && (
+            <div>
+              <label>Сумма кредита:</label>
+              <input
+                type="number"
+                value={creditAmount}
+                onChange={(e) => setCreditAmount(e.target.value)}
+              />
+            </div>
+          )}
           <div>
-            <label>Стоимость объекта:</label>
+            <label>Срок кредита (в месяцах):</label>
             <input
               type="number"
-              value={cost}
-              onChange={(e) => setCost(e.target.value)}
+              value={creditTerm}
+              onChange={(e) => setCreditTerm(e.target.value)}
             />
           </div>
-          <div>
-            <label>Первоначальный взнос:</label>
-            <input
-              type="number"
-              value={downPayment}
-              onChange={(e) => setDownPayment(e.target.value)}
-            />
-          </div>
+          <button 
+            onClick={handleCalculate} 
+            disabled={isButtonDisabled()}
+          >
+            Рассчитать
+          </button>
         </>
       )}
-      {(productNameLower === 'потребительский кредит' || !selectedBankProduct) && (
-        <div>
-          <label>Сумма кредита:</label>
-          <input
-            type="number"
-            value={creditAmount}
-            onChange={(e) => setCreditAmount(e.target.value)}
-          />
-        </div>
-      )}
-      <div>
-        <label>Срок кредита (в месяцах):</label>
-        <input
-          type="number"
-          value={creditTerm}
-          onChange={(e) => setCreditTerm(e.target.value)}
-        />
-      </div>
-      <button onClick={handleCalculate}>Рассчитать</button>
 
       {result && (
         <div>
           <h3>Результаты расчёта</h3>
-          <p>Продукт: {result.productName}</p>
+          <p>Продукт: {result.calculatorName}</p>
           <p>Годовая ставка: {result.annualRate}%</p>
           <p>Сумма кредита: {result.loanAmount}</p>
           <p>Ежемесячный платёж: {result.monthlyPayment}</p>
@@ -132,4 +164,4 @@ const Calculator = () => {
   );
 };
 
-export default Calculator;
+export default CalculatorPage;

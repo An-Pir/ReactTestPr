@@ -66,29 +66,27 @@ router.post('/calculate', async (req, res) => {
       return res.status(400).json({ message: 'Недостаточно данных для расчёта' });
     }
 
-    // Поиск выбранного банковского продукта в базе
-    const product = await Calculator.findById(calculatorId);
-    if (!product) {
+    // Поиск выбранного банковского калькулятора в базе
+    const calculator = await Calculator.findById(calculatorId);
+    if (!calculator) {
       return res.status(404).json({ message: 'Банковский продукт не найден' });
     }
 
     // Годовая процентная ставка из БД
-    // Должна соответствовать одному из значений:
-    // Ипотека - 9.6, Автокредит - 3.5, Потребительский кредит - 14.5
-    const annualRate = product.interestRate; 
+    const annualRate = calculator.interestRate; 
 
     let loanAmount;
-    const productNameLower = product.productName.toLowerCase();
+    const calculatorNameLower = calculator.calculatorName.toLowerCase();
 
     // Если продукт - "ипотека" или "автокредит", рассчитываем сумму кредита как разницу между стоимостью и первоначальным взносом.
-    if (productNameLower === 'ипотека' || productNameLower === 'автокредит') {
+    if (calculatorNameLower === 'ипотека' || calculatorNameLower === 'автокредит') {
       if (cost == null || downPayment == null) {
         return res.status(400).json({ message: 'Для расчёта ипотеки или автокредита требуется указать стоимость и первоначальный взнос' });
       }
       loanAmount = Number(cost) - Number(downPayment);
     } 
     // Если продукт - "потребительский кредит", сумма кредита передаётся напрямую.
-    else if (productNameLower === 'потребительский кредит') {
+    else if (calculatorNameLower === 'потребительский кредит') {
       loanAmount = Number(creditAmount);
     }
     // Если название продукта не соответствует известным, пытаемся использовать переданный creditAmount,
@@ -110,7 +108,7 @@ router.post('/calculate', async (req, res) => {
     const requiredIncome = monthlyPayment * 2.5;
 
     res.status(200).json({
-      productName: product.productName,
+      calculatorName: calculator.calculatorName,
       annualRate: annualRate,
       loanAmount: loanAmount.toFixed(2),
       creditTerm,
