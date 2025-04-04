@@ -93,7 +93,7 @@ const RegistrationForm = () => {
 
   return (
     <div onClick={handleClosePage} className='flex-1 flex flex-col items-center justify-center p-4'>
-      <form onClick={handleFormClick} onSubmit={handleSubmit} className='max-w-2xl flex flex-col items-center gap-4 shadow-lg p-10 bg-white rounded-md absolute'>
+      <form onClick={handleFormClick} onSubmit={handleSubmit} className=' flex flex-col items-center gap-6 shadow-lg p-15  bg-white rounded-md absolute'>
         <AuthFormTitle title='Регистрация' />
 
         {error && <div className='text-lg text-center font-medium text-red-500 underline'>{error}</div>}
@@ -113,7 +113,7 @@ const RegistrationForm = () => {
         </label>
 
         <div className='flex justify-center gap-3.5'>
-          <Button name={loading ? 'Загрузка...' : 'Зарегистрироваться'} />
+          <Button name={loading ? 'Загрузка...' : 'Зарегистрироваться'} className=' bg-dark-blue text-white hover:text-orange px-5 '/>
         </div>
       </form>
     </div>
