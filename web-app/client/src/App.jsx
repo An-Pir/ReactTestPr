@@ -5,6 +5,7 @@ import MainPage from './Components/Pages/MainPage';
 import LoginForm from './Components/Pages/Auth/LoginForm';
 import RegistrationForm from './Components/Pages/Auth/RegistrationForm';
 import AdminInterface from './Components/Pages/Admin/AdminInterface';
+import CalculatorPage from './Components/Pages/CalculatorPage';
 
 function App() {
   return (
@@ -16,10 +17,12 @@ function App() {
           <Route path='/login' element={<LoginForm />} />
           <Route path='/registration' element={<RegistrationForm />} />
           <Route path='/admin' element={<AdminInterface />} />
+          <Route path='/calculator' element={<CalculatorPage/>} />
         </Routes>
         <Footer />
       </div>
     </Router>
+    
   );
 }
 

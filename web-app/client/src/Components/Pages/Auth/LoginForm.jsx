@@ -33,15 +33,17 @@ const LoginForm = () => {
 
     try {
       const response = await axios.post('http://localhost:5000/api/auth/login', { login, password });
-      const { token, role } = response.data; // Предполагаем, что API возвращает объект с полями token и role
+      const { token, role } = response.data; // API возвращает объект с полями token и role
 
       // Сохраняем токен в localStorage
       localStorage.setItem('token', token);
 
       if (role === 'admin') {
-        navigate('/admin'); // Перенаправляем на страницу администратора
+        navigate('/admin'); // Перенаправляем админа на страницу администратора
+      } else if (role === 'user'){
+        navigate('/calculator'); // Перенаправляем пользователя с ролью user на страницу банковского калькулятора
       } else {
-        setError('У вас нет доступа к этой странице'); // Сообщение об ошибке для неадминистраторов
+        setError('У вас нет доступа'); // Сообщение об отсутствии доступа для прочих ролей
       }
     } catch (err) {
       setError('Ошибка авторизации. Проверьте логин и пароль.');
@@ -88,7 +90,7 @@ const LoginForm = () => {
           required
         />
 
-        <div className='flex justify-between gap-x-10 '>
+        <div className='flex justify-between gap-x-10'>
           <Button 
             name={loading ? 'Загрузка...' : 'Войти'} 
             disabled={loading} 
