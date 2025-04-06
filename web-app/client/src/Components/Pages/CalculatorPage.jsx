@@ -3,6 +3,7 @@ import axios from 'axios';
 import PageTitle from '../Common/PageTitle';
 import Input from '../Common/Input';
 import Button from '../Common/Button';
+import NumberInput from '../Common/NumberInput';
 
 const CalculatorPage = () => {
   const [bankCalculators, setBankCalculators] = useState([]);
@@ -114,8 +115,7 @@ const CalculatorPage = () => {
       calculatorNameLower === 'ипотечный' ||
       calculatorNameLower === 'автокредит'
         ? cost > 0 && downPayment >= 0 && creditTerm > 0
-        : calculatorNameLower === 'потребительский кредит' ||
-          !selectedBankCalculator
+        : calculatorNameLower === 'потребительский' || !selectedBankCalculator
         ? creditAmount > 0 && creditTerm > 0
         : creditTerm > 0; // Для прочих случаев требуется заполнить только срок кредита
 
@@ -162,11 +162,10 @@ const CalculatorPage = () => {
               <div className=''>
                 <label className='flex flex-col mb-1 text-lg '>
                   Стоимость объекта:
-                  <Input
-                    type='number'
+                  <NumberInput
                     placeholder='Укажите цену'
                     value={cost}
-                    onChange={(e) => setCost(e.target.value)}
+                    onChange={(value) => setCost(value)}
                   />
                 </label>
 
@@ -175,11 +174,10 @@ const CalculatorPage = () => {
               <div>
                 <label className='flex flex-col mb-1 text-lg '>
                   Первоначальный взнос:
-                  <Input
-                    type='number'
+                  <NumberInput
                     placeholder='Укажите сумму'
                     value={downPayment}
-                    onChange={(e) => setDownPayment(e.target.value)}
+                    onChange={(value) => setDownPayment(value)}
                   />
                 </label>
 
@@ -194,11 +192,11 @@ const CalculatorPage = () => {
             <div className=''>
               <label className='flex flex-col mb-1 text-lg '>
                 Сумма кредита:
-                <Input
-                  type='number'
+                <NumberInputt
+
                   placeholder='Укажите сумму '
                   value={creditAmount}
-                  onChange={(e) => setCreditAmount(e.target.value)}
+                  onChange={(value) => setCreditAmount(value)}
                 />
               </label>
 
@@ -222,9 +220,12 @@ const CalculatorPage = () => {
               <p className='text-red-500'>{errors.creditTerm}</p>
             )}
           </div>
-          <Button onClick={handleCalculate} disabled={isButtonDisabled()} className='bg-dark-blue text-white hover:text-orange px-5' name='Рассчитать' >
-           
-          </Button>
+          <Button
+            onClick={handleCalculate}
+            disabled={isButtonDisabled()}
+            className='bg-dark-blue text-white hover:text-orange px-5'
+            name='Рассчитать'
+          ></Button>
         </div>
       )}
 
