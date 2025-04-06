@@ -129,7 +129,7 @@ const CalculatorPage = () => {
           Выберите калькулятор:
         </label>
         <select
-          className='text-center text-[18px] font-bold sm:text-2xl lg:text-3xl text-orange focus:outline-none'
+          className='text-center text-lg sm:text-xl lg:text-2xl text-orange font-medium focus:outline-none'
           value={selectedCalculator}
           onChange={(e) => {
             setSelectedCalculator(e.target.value);
@@ -142,10 +142,10 @@ const CalculatorPage = () => {
           }}
         >
           <option className='text-dark-blue' value=''>
-            -- Все калькуляторы --
+--Выбирете калькулятор --
           </option>
           {bankCalculators.map((calculator) => (
-            <option key={calculator._id} value={calculator._id}>
+            <option key={calculator._id} value={calculator._id} className='text-dark-blue text-[12px] lg:text-lg '>
               {calculator.calculatorName} (
               {calculator.interestRate || calculator.annualRate}%)
             </option>
@@ -168,8 +168,8 @@ const CalculatorPage = () => {
                   />
                 </label>
                 <span className='absolute text-2xl right-3 top-13 transform -translate-y-1/2 text-orange'>
-                    ₽
-                  </span>
+                  ₽
+                </span>
 
                 {errors.cost && <p className='text-orange'>{errors.cost}</p>}
               </div>
@@ -203,7 +203,9 @@ const CalculatorPage = () => {
                   onChange={(value) => setCreditAmount(value)}
                 />
               </label>
-              <span className='absolute text-2xl right-3 top-13 transform -translate-y-1/2 text-orange'>₽</span>
+              <span className='absolute text-2xl right-3 top-13 transform -translate-y-1/2 text-orange'>
+                ₽
+              </span>
 
               {errors.creditAmount && (
                 <p className='text-orange'>{errors.creditAmount}</p>
@@ -234,13 +236,32 @@ const CalculatorPage = () => {
       )}
 
       {result && (
-        <div>
-          <h2>Результаты расчёта</h2>
-          <p>Калькулятор: {result.calculatorName}</p>
-          <p>Годовая ставка: {result.annualRate}%</p>
-          <p>Сумма кредита: {result.loanAmount}</p>
-          <p>Ежемесячный платёж: {result.monthlyPayment}</p>
-          <p>Необходимый доход: {result.requiredIncome}</p>
+        <div className=' flex flex-col gap-3 bg-gray-300 py-10 mt-5 items-center'>
+          <h2 className='text-dark-blue text-xl md:text-3xl lg:text-4xl  underline mb-4'>
+            Результаты расчёта
+          </h2>
+          <div className='flex flex-col gap-2 text-lg md:text-xl lg:text-2xl'>
+            <p className=' text-dark-blue'>
+              Калькулятор:{' '}
+              <span className=' text-orange pl-4'>{result.calculatorName}</span>
+            </p>
+            <p className=' text-dark-blue'>
+              Годовая ставка:{' '}
+              <span className=' text-orange pl-4'>{result.annualRate}%</span>
+            </p>
+            <p className=' text-dark-blue'>
+              Сумма кредита:{' '}
+              <span className=' text-orange pl-4'>{result.loanAmount}</span>
+            </p>
+            <p className=' text-dark-blue'>
+              Ежемесячный платёж:{' '}
+              <span className=' text-orange pl-4'>{result.monthlyPayment}</span>
+            </p>
+            <p className=' text-dark-blue'>
+              Необходимый доход:{' '}
+              <span className=' text-orange pl-4'>{result.requiredIncome}</span>
+            </p>
+          </div>
         </div>
       )}
     </div>
