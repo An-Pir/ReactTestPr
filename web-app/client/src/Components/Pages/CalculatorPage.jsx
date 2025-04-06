@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PageTitle from '../Common/PageTitle';
-import Input from '../Common/Input';
 import Button from '../Common/Button';
 import NumberInput from '../Common/NumberInput';
 
@@ -130,7 +129,7 @@ const CalculatorPage = () => {
           Выберите калькулятор:
         </label>
         <select
-          className='text-center text-[18px] sm:text-2xl lg:text-3xl text-orange focus:outline-none'
+          className='text-center text-[18px] font-bold sm:text-2xl lg:text-3xl text-orange focus:outline-none'
           value={selectedCalculator}
           onChange={(e) => {
             setSelectedCalculator(e.target.value);
@@ -159,7 +158,7 @@ const CalculatorPage = () => {
           {(calculatorNameLower === 'ипотечный' ||
             calculatorNameLower === 'автокредит') && (
             <div className='flex flex-col gap-5'>
-              <div className=''>
+              <div className='relative'>
                 <label className='flex flex-col mb-1 text-lg '>
                   Стоимость объекта:
                   <NumberInput
@@ -168,10 +167,13 @@ const CalculatorPage = () => {
                     onChange={(value) => setCost(value)}
                   />
                 </label>
+                <span className='absolute text-2xl right-3 top-13 transform -translate-y-1/2 text-orange'>
+                    ₽
+                  </span>
 
                 {errors.cost && <p className='text-orange'>{errors.cost}</p>}
               </div>
-              <div>
+              <div className='relative'>
                 <label className='flex flex-col mb-1 text-lg '>
                   Первоначальный взнос:
                   <NumberInput
@@ -179,6 +181,9 @@ const CalculatorPage = () => {
                     value={downPayment}
                     onChange={(value) => setDownPayment(value)}
                   />
+                  <span className='absolute text-2xl right-3 top-13 transform -translate-y-1/2 text-orange'>
+                    ₽
+                  </span>
                 </label>
 
                 {errors.downPayment && (
@@ -189,16 +194,16 @@ const CalculatorPage = () => {
           )}
           {(calculatorNameLower === 'потребительский' ||
             !selectedBankCalculator) && (
-            <div className=''>
-              <label className='flex flex-col mb-1 text-lg '>
+            <div className='relative'>
+              <label className='flex flex-col mb-1 text-lg  '>
                 Сумма кредита:
-                <NumberInputt
-
+                <NumberInput
                   placeholder='Укажите сумму '
                   value={creditAmount}
                   onChange={(value) => setCreditAmount(value)}
                 />
               </label>
+              <span className='absolute text-2xl right-3 top-13 transform -translate-y-1/2 text-orange'>₽</span>
 
               {errors.creditAmount && (
                 <p className='text-orange'>{errors.creditAmount}</p>
@@ -208,11 +213,10 @@ const CalculatorPage = () => {
           <div>
             <label className='flex flex-col mb-1 text-lg'>
               Срок кредита (в месяцах):
-              <Input
-                type='number'
+              <NumberInput
                 placeholder='Укажите количество месяцев '
                 value={creditTerm}
-                onChange={(e) => setCreditTerm(e.target.value)}
+                onChange={(value) => setCreditTerm(value)}
               />
             </label>
 

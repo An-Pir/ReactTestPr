@@ -1,7 +1,10 @@
-
-
-const NumberInput = ({ value, onChange, placeholder, className = '', ...rest }) => {
-
+const NumberInput = ({
+  value,
+  onChange,
+  placeholder,
+  className = '',
+  ...rest
+}) => {
   // Функция форматирования: удаляет все нецифровые символы и вставляет пробелы каждые 3 цифры
   const formatNumber = (numStr) => {
     const cleaned = numStr.replace(/\D/g, '');
@@ -15,14 +18,17 @@ const NumberInput = ({ value, onChange, placeholder, className = '', ...rest }) 
     onChange(cleaned);
   };
   return (
-    <input
-    {...rest}
-      type='text'
-      value={formatNumber(value)}
-      onChange={handleChange}
-      placeholder={placeholder}
-      className={`border focus:outline-none focus:border-orange border-light-blue text-dark-blue placeholder:text-gray-300 rounded-lg p-2 w-74 ${className}`}
-    />
+    <>
+      <input
+        {...rest}
+        type='text'
+        value={formatNumber(value)}
+        onChange={handleChange}
+        placeholder={placeholder}
+        className={`border focus:outline-none focus:border-orange border-light-blue text-dark-blue placeholder:text-gray-300 rounded-lg p-2 w-74 ${className}`}
+      />
+      
+    </>
   );
 };
 
