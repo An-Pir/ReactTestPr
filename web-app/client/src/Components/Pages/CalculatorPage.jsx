@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import PageTitle from '../Common/PageTitle';
 import Button from '../Common/Button';
 import NumberInput from '../Common/NumberInput';
+import { fetchCalculators, calculateResult } from '../../api/calculatorsApi';
 
 const CalculatorPage = () => {
   const [bankCalculators, setBankCalculators] = useState([]);
@@ -16,18 +16,16 @@ const CalculatorPage = () => {
 
   // Получение списка банковских продуктов с сервера
   useEffect(() => {
-    const fetchCalculators = async () => {
+    const loadCalculators = async () => {
       try {
-        const response = await axios.get(
-          'http://localhost:5000/api/calculators'
-        );
-        setBankCalculators(response.data);
+        const data = await fetchCalculators();
+        setBankCalculators(data);
       } catch (err) {
         console.error('Ошибка при получении калькуляторов:', err);
       }
     };
 
-    fetchCalculators();
+    loadCalculators();
   }, []);
 
   // Валидация для введенных данных, чтобы избежать отправки некорректных значений на сервер.
@@ -41,64 +39,60 @@ const CalculatorPage = () => {
       calculatorNameLower === 'ипотечный' ||
       calculatorNameLower === 'автокредит'
     ) {
-      if (!cost || cost <= 0)
-        newErrors.cost = 'Стоимость объекта должна быть положительным числом.';
+      if (!cost || cost <= 0) newErrors.cost = 'Введите стоимость объекта.';
       if (!downPayment || downPayment < 0)
-        newErrors.downPayment =
-          'Первоначальный взнос не может быть отрицательным.';
+        newErrors.downPayment = 'Введите сумму первоначального взноса.';
       if (!creditTerm || creditTerm <= 0)
-        newErrors.creditTerm = 'Срок кредита должен быть положительным числом.';
-    } else if (calculatorNameLower === 'потребительский кредит') {
-      if (!creditAmount || creditAmount <= 0)
-        newErrors.creditAmount =
-          'Сумма кредита должна быть положительным числом.';
-      if (!creditTerm || creditTerm <= 0)
-        newErrors.creditTerm = 'Срок кредита должен быть положительным числом.';
+        newErrors.creditTerm = 'Введите срок займа.';
     } else {
+      // Для всех остальных (в т.ч. «потребительский» и новых калькуляторов)
       if (!creditAmount || creditAmount <= 0)
-        newErrors.creditAmount =
-          'Сумма кредита должна быть положительным числом.';
+        newErrors.creditAmount = 'Введите сумму займа.';
       if (!creditTerm || creditTerm <= 0)
-        newErrors.creditTerm = 'Срок кредита должен быть положительным числом.';
+        newErrors.creditTerm = 'Введите срок займа.';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; // Возвращаем true, если ошибок нет
   };
 
-  const handleCalculate = () => {
-    if (!validateInputs()) return; // Проверяем валидацию перед расчетом
+  const handleCalculate = async () => {
+    if (!validateInputs()) return;
 
-    const selectedBankCalculator = bankCalculators.find(
-      (calculator) => calculator._id === selectedCalculator
+    const currentCalculator = bankCalculators.find(
+      (calc) => calc._id === selectedCalculator
     );
+    const calculatorNameLower = currentCalculator?.calculatorName.toLowerCase() || '';
 
     const requestData = {
       calculatorId: selectedCalculator,
       creditTerm: Number(creditTerm) / 12,
     };
 
-    if (selectedBankCalculator) {
-      const calculatorNameLower =
-        selectedBankCalculator.calculatorName.toLowerCase();
-
-      if (
-        calculatorNameLower === 'ипотечный' ||
-        calculatorNameLower === 'автокредит'
-      ) {
-        requestData.cost = Number(cost);
-        requestData.downPayment = Number(downPayment);
-      } else {
-        requestData.creditAmount = Number(creditAmount);
-      }
+    if (calculatorNameLower === 'ипотечный' || calculatorNameLower === 'автокредит') {
+      requestData.cost = Number(cost);
+      requestData.downPayment = Number(downPayment);
     } else {
       requestData.creditAmount = Number(creditAmount);
     }
 
-    axios
-      .post('http://localhost:5000/api/calculators/calculate', requestData)
-      .then((response) => setResult(response.data))
-      .catch((err) => console.error('Ошибка при расчете:', err));
+    try {
+      const calcResult = await calculateResult(requestData);
+      setResult(calcResult);
+    } catch (err) {
+      console.error('Ошибка при расчете:', err);
+    }
+  };
+
+  // Обработчик сброса всех данных
+  const handleReset = () => {
+    setSelectedCalculator('');
+    setCreditAmount('');
+    setCreditTerm('');
+    setCost('');
+    setDownPayment('');
+    setResult(null);
+    setErrors({});
   };
 
   const selectedBankCalculator = bankCalculators.find(
@@ -108,18 +102,7 @@ const CalculatorPage = () => {
     ? selectedBankCalculator.calculatorName.toLowerCase()
     : '';
 
-  const isButtonDisabled = () => {
-    const isCalculatorSelected = selectedCalculator !== '';
-    const isFormFilled =
-      calculatorNameLower === 'ипотечный' ||
-      calculatorNameLower === 'автокредит'
-        ? cost > 0 && downPayment >= 0 && creditTerm > 0
-        : calculatorNameLower === 'потребительский' || !selectedBankCalculator
-        ? creditAmount > 0 && creditTerm > 0
-        : creditTerm > 0; // Для прочих случаев требуется заполнить только срок кредита
-
-    return !isCalculatorSelected || !isFormFilled;
-  };
+ 
 
   return (
     <div className='container m-auto h-screen flex flex-col'>
@@ -142,10 +125,14 @@ const CalculatorPage = () => {
           }}
         >
           <option className='text-dark-blue' value=''>
---Выбирете калькулятор --
+            --Выбирете калькулятор --
           </option>
           {bankCalculators.map((calculator) => (
-            <option key={calculator._id} value={calculator._id} className='text-dark-blue text-[12px] lg:text-lg '>
+            <option
+              key={calculator._id}
+              value={calculator._id}
+              className='text-dark-blue text-[12px] lg:text-lg '
+            >
               {calculator.calculatorName} (
               {calculator.interestRate || calculator.annualRate}%)
             </option>
@@ -170,7 +157,6 @@ const CalculatorPage = () => {
                 <span className='absolute text-2xl right-3 top-13 transform -translate-y-1/2 text-orange'>
                   ₽
                 </span>
-
                 {errors.cost && <p className='text-orange'>{errors.cost}</p>}
               </div>
               <div className='relative'>
@@ -185,81 +171,88 @@ const CalculatorPage = () => {
                     ₽
                   </span>
                 </label>
-
                 {errors.downPayment && (
-                  <p className='text-red-500'>{errors.downPayment}</p>
+                  <p className='text-orange'>{errors.downPayment}</p>
                 )}
               </div>
             </div>
           )}
-          {(calculatorNameLower === 'потребительский' ||
-            !selectedBankCalculator) && (
-            <div className='relative'>
-              <label className='flex flex-col mb-1 text-lg  '>
-                Сумма кредита:
-                <NumberInput
-                  placeholder='Укажите сумму '
-                  value={creditAmount}
-                  onChange={(value) => setCreditAmount(value)}
-                />
-              </label>
-              <span className='absolute text-2xl right-3 top-13 transform -translate-y-1/2 text-orange'>
-                ₽
-              </span>
 
-              {errors.creditAmount && (
-                <p className='text-orange'>{errors.creditAmount}</p>
-              )}
-            </div>
-          )}
+          {/* Если калькулятор не "ипотечный" и не "автокредит" – отображаем поле для суммы кредита */}
+          {calculatorNameLower !== 'ипотечный' &&
+            calculatorNameLower !== 'автокредит' && (
+              <div className='relative'>
+                <label className='flex flex-col mb-1 text-lg  '>
+                  Сумма кредита:
+                  <NumberInput
+                    placeholder='Укажите сумму'
+                    value={creditAmount}
+                    onChange={(value) => setCreditAmount(value)}
+                  />
+                </label>
+                <span className='absolute text-2xl right-3 top-13 transform -translate-y-1/2 text-orange'>
+                  ₽
+                </span>
+                {errors.creditAmount && (
+                  <p className='text-orange'>{errors.creditAmount}</p>
+                )}
+              </div>
+            )}
+
           <div>
             <label className='flex flex-col mb-1 text-lg'>
               Срок кредита (в месяцах):
               <NumberInput
-                placeholder='Укажите количество месяцев '
+                placeholder='Укажите количество месяцев'
                 value={creditTerm}
                 onChange={(value) => setCreditTerm(value)}
               />
             </label>
-
             {errors.creditTerm && (
-              <p className='text-red-500'>{errors.creditTerm}</p>
+              <p className='text-orange'>{errors.creditTerm}</p>
             )}
           </div>
-          <Button
-            onClick={handleCalculate}
-            disabled={isButtonDisabled()}
-            className='bg-dark-blue text-white hover:text-orange px-5'
-            name='Рассчитать'
-          ></Button>
+          <div className=' flex  gap-4 '>
+            <Button
+              onClick={handleCalculate}
+              className='bg-dark-blue text-white hover:text-orange px-5'
+              name='Рассчитать'
+            ></Button>
+
+            <Button
+              onClick={handleReset}
+              className='bg-dark-blue text-white hover:text-orange px-5'
+              name='Сбросить'
+            />
+          </div>
         </div>
       )}
 
       {result && (
-        <div className=' flex flex-col gap-3 bg-gray-300 py-10 mt-5 items-center'>
-          <h2 className='text-dark-blue text-xl md:text-3xl lg:text-4xl  underline mb-4'>
+        <div className='flex flex-col gap-3 bg-gray-300 py-10 mt-5 items-center'>
+          <h2 className='text-dark-blue text-xl md:text-3xl lg:text-4xl underline mb-4'>
             Результаты расчёта
           </h2>
           <div className='flex flex-col gap-2 text-lg md:text-xl lg:text-2xl'>
-            <p className=' text-dark-blue'>
+            <p className='text-dark-blue'>
               Калькулятор:{' '}
-              <span className=' text-orange pl-4'>{result.calculatorName}</span>
+              <span className='text-orange pl-4'>{result.calculatorName}</span>
             </p>
-            <p className=' text-dark-blue'>
+            <p className='text-dark-blue'>
               Годовая ставка:{' '}
-              <span className=' text-orange pl-4'>{result.annualRate}%</span>
+              <span className='text-orange pl-4'>{result.annualRate}%</span>
             </p>
-            <p className=' text-dark-blue'>
+            <p className='text-dark-blue'>
               Сумма кредита:{' '}
-              <span className=' text-orange pl-4'>{result.loanAmount}</span>
+              <span className='text-orange pl-4'>{result.loanAmount}</span>
             </p>
-            <p className=' text-dark-blue'>
+            <p className='text-dark-blue'>
               Ежемесячный платёж:{' '}
-              <span className=' text-orange pl-4'>{result.monthlyPayment}</span>
+              <span className='text-orange pl-4'>{result.monthlyPayment}</span>
             </p>
-            <p className=' text-dark-blue'>
+            <p className='text-dark-blue'>
               Необходимый доход:{' '}
-              <span className=' text-orange pl-4'>{result.requiredIncome}</span>
+              <span className='text-orange pl-4'>{result.requiredIncome}</span>
             </p>
           </div>
         </div>
