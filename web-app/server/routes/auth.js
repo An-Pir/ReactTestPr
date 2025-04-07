@@ -1,15 +1,15 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken'); // Импортируем jsonwebtoken для работы с JWT
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const router = express.Router();
 
+const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'Anatan$0304';
 
 // Middleware для проверки валидности токена
 const verifyToken = (req, res, next) => {
-  // Извлекаем токен из заголовка Authorization
   const authHeader = req.headers.authorization;
+
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'Нет токена, авторизуйтесь' });
   }
@@ -18,8 +18,7 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    // Сохраняем полученные данные токена в req.user для дальнейшего использования
-    req.user = decoded;
+    req.user = decoded; // Сохраняем данные токена для дальнейшего использования
     next();
   } catch (error) {
     console.error('Ошибка валидации токена:', error);
@@ -29,7 +28,6 @@ const verifyToken = (req, res, next) => {
 
 // Middleware для проверки прав администратора
 const adminAuth = (req, res, next) => {
-  // Предполагается, что req.user уже установлен в verifyToken
   if (!req.user || req.user.role !== 'admin') {
     return res.status(403).json({ message: 'Нет доступа. Требуются права администратора' });
   }
@@ -40,13 +38,13 @@ const adminAuth = (req, res, next) => {
 router.post('/register', async (req, res) => {
   const { login, email, password } = req.body;
 
-  // Проверка на обязательные поля
+  // Проверка обязательных полей
   if (!login || !email || !password) {
     return res.status(400).json({ message: 'Все поля должны быть заполнены' });
   }
 
   try {
-    // Проверка на существование пользователя с таким же login или email
+    // Проверяем, существует ли пользователь с таким же логином или email
     const existingUser = await User.findOne({ $or: [{ login }, { email }] });
     if (existingUser) {
       return res.status(400).json({ message: 'Пользователь с таким логином или email уже существует' });
@@ -55,8 +53,7 @@ router.post('/register', async (req, res) => {
     // Хеширование пароля
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Создание нового пользователя. По умолчанию назначаем роль 'user'.
-    // Если необходимо, администратор может быть назначен вручную в базе данных.
+    // Создание нового пользователя (роль пользователя по умолчанию — 'user')
     const newUser = new User({
       login,
       email,
@@ -64,25 +61,25 @@ router.post('/register', async (req, res) => {
       role: 'user'
     });
 
-    // Сохранение пользователя в базе данных MongoDB
+    // Сохраняем пользователя в базе данных
     await newUser.save();
 
-    // Генерация токена сразу после регистрации
+    // Генерация JWT (срок жизни 1 час)
     const payload = { userId: newUser._id, role: newUser.role };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: 'Пользователь успешно зарегистрирован',
       user: { login: newUser.login, email: newUser.email },
-      token, // возвращаем токен при регистрации
+      token // возвращаем токен сразу при регистрации
     });
   } catch (error) {
     console.error('Ошибка регистрации:', error);
-    res.status(500).json({ message: 'Ошибка сервера при регистрации пользователя' });
+    return res.status(500).json({ message: 'Ошибка сервера при регистрации пользователя' });
   }
 });
 
-// Роут для аутентификации пользователя с использованием JWT
+// Роут для аутентификации пользователя
 router.post('/login', async (req, res) => {
   const { login, password } = req.body;
 
@@ -93,7 +90,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Неверные учетные данные' });
     }
 
-    // Сравнение введенного пароля с хэшированным паролем
+    // Сравнение паролей
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Неверные учетные данные' });
@@ -102,33 +99,32 @@ router.post('/login', async (req, res) => {
     // Формирование полезной нагрузки для JWT
     const payload = {
       userId: user._id,
-      role: user.role || 'user',
+      role: user.role || 'user'
     };
 
-    // Генерация JWT с временем жизни 1 час
+    // Генерация JWT (1 час)
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-    // Возвращение токена
-    res.json({ token, role: user.role || 'user' });
+    return res.json({ token, role: user.role || 'user' });
   } catch (error) {
     console.error('Ошибка аутентификации:', error);
-    res.status(500).json({ message: 'Ошибка сервера при аутентификации пользователя' });
+    return res.status(500).json({ message: 'Ошибка сервера при аутентификации пользователя' });
   }
 });
 
-// Пример защищенного маршрута, доступного только при наличии валидного токена
+// Защищённый роут для доступа к профилю
 router.get('/profile', verifyToken, (req, res) => {
-  res.json({
+  return res.json({
     message: 'Доступ к профилю разрешен',
-    user: req.user,
+    user: req.user
   });
 });
 
-// Защищенный маршрут админпанели: доступ разрешен только пользователям с ролью admin
+// Защищённый роут для админпанели (требуются права администратора)
 router.get('/admin', verifyToken, adminAuth, (req, res) => {
-  res.json({
+  return res.json({
     message: 'Добро пожаловать в админпанель!',
-    user: req.user,
+    user: req.user
   });
 });
 

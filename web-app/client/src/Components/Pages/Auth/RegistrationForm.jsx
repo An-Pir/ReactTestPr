@@ -17,14 +17,6 @@ const RegistrationForm = () => {
   
   const navigate = useNavigate();
 
-  const resetForm = () => {
-    setLogin('');
-    setEmail('');
-    setPassword('');
-    setRepPassword('');
-    setChecked(false);
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);

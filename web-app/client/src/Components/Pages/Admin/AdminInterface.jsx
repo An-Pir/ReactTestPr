@@ -104,7 +104,6 @@ const AdminInterface = () => {
   const handleLogout = () => {
     // Удаляем токен из localStorage (если он там хранится)
     localStorage.removeItem('token');
-    // Можно удалить и другие сохранённые данные, если они есть
 
     // Перенаправляем пользователя на страницу логина или главную страницу
     navigate('/login');
