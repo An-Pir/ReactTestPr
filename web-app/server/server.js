@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const connectDB = require('./db'); // Функция подключения MongoDB
+const connectDB = require('./db'); // подключение к MongoDB
 const authRoutes = require('./routes/auth');
 const calculatorRoutes = require('./routes/calculators'); // Импортируем маршруты калькуляторов
 

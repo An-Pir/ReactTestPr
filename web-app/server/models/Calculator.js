@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const calculatorSchema = new mongoose.Schema({
-  productName: { type: String, required: true },
+  calculatorName: { type: String, required: true },
   interestRate: { type: Number, required: true }
 });
 
