@@ -44,6 +44,7 @@ const CalculatorPage = () => {
         newErrors.downPayment = 'Введите сумму первоначального взноса.';
       if (!creditTerm || creditTerm <= 0)
         newErrors.creditTerm = 'Введите срок займа.';
+      if (cost <= downPayment ) newErrors.downPayment = 'Не корректная сумма.';
     } else {
       // Для всех остальных (в т.ч. «потребительский» и новых калькуляторов)
       if (!creditAmount || creditAmount <= 0)

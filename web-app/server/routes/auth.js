@@ -82,7 +82,6 @@ router.post('/register', async (req, res) => {
 // Роут для аутентификации пользователя
 router.post('/login', async (req, res) => {
   const { login, password } = req.body;
-
   try {
     // Поиск пользователя по логину
     const user = await User.findOne({ login });
